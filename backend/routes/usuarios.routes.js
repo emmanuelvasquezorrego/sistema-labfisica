@@ -32,6 +32,9 @@ router.get('/buscar/nombre/:nombre', auth, UsuariosController.buscarPorNombre);
 // Actualizar contraseña (usuario o admin)
 router.put('/:id/password', auth, UsuariosController.actualizarContraseña);
 
+// Actualizar datos del usuario (por ejemplo: rol) – solo admin
+router.put('/:id', auth, autorizarRol('admin'), UsuariosController.actualizar);
+
 // Eliminar usuario (solo admin)
 router.delete('/:id', auth, autorizarRol('admin'), UsuariosController.eliminar);
 

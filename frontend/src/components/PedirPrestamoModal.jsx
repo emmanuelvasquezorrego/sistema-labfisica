@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import generarPDF from "../utils/generarPDF";
 import axios from "axios";
 import ConfirmacionPrestamoModal from "./ConfirmacionPrestamoModal";
+import jsPDF from "jspdf";
 
 export default function PedirPrestamoModal({ isOpen, onClose, equipo, onPrestamoConfirmado }) {
   // Obtener datos del usuario autenticado desde el contexto
