@@ -1,17 +1,17 @@
 export default function FiltroEquipos({ filtro, setFiltro }) {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap items-center gap-4 w-full">
       <input
         type="text"
         placeholder="Buscar por nombre"
         value={filtro.texto}
         onChange={(e) => setFiltro({ ...filtro, texto: e.target.value })}
-        className="border px-3 py-1 rounded w-full sm:w-auto"
+        className="border rounded px-3 py-1 flex-grow max-w-xs"
       />
       <select
         value={filtro.estado}
         onChange={(e) => setFiltro({ ...filtro, estado: e.target.value })}
-        className="border px-3 py-1 rounded"
+        className="border rounded px-3 py-1"
       >
         <option value="">Todos los estados</option>
         <option value="Disponible">Disponible</option>
@@ -21,7 +21,7 @@ export default function FiltroEquipos({ filtro, setFiltro }) {
       <select
         value={filtro.tipo}
         onChange={(e) => setFiltro({ ...filtro, tipo: e.target.value })}
-        className="border px-3 py-1 rounded"
+        className="border rounded px-3 py-1"
       >
         <option value="">Todos los tipos</option>
         <option value="Eléctrico">Eléctrico</option>

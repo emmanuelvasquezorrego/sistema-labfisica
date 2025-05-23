@@ -3,32 +3,42 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+
 export default function ActualizarPerfil() {
-  const { usuario } = useAuth();
-  const [actual, setActual] = useState("");
-  const [nueva, setNueva] = useState("");
-  const [repetir, setRepetir] = useState("");
-  const [mensaje, setMensaje] = useState("");
+  const { usuario } = useAuth(); // Obtenemos el usuario autenticado desde el contexto
 
+  // Estados para las contraseñas y el mensaje de feedback
+  const [actual, setActual] = useState("");   // Contraseña actual
+  const [nueva, setNueva] = useState("");     // Nueva contraseña
+  const [repetir, setRepetir] = useState(""); // Confirmación nueva contraseña
+  const [mensaje, setMensaje] = useState(""); // Mensaje de éxito o error
+
+  // useEffect para limpiar el mensaje automáticamente después de 4 segundos
   useEffect(() => {
-      if (mensaje) {
-        const timeout = setTimeout(() => {
-          setMensaje("");
-        }, 4000); // 4 segundos
+    if (mensaje) {
+      const timeout = setTimeout(() => {
+        setMensaje("");
+      }, 4000); // Limpia mensaje después de 4 segundos
 
-        return () => clearTimeout(timeout); // limpieza si cambia rápido
-      }
-    }, [mensaje]);
+      return () => clearTimeout(timeout); // Limpieza si el mensaje cambia rápido
+    }
+  }, [mensaje]);
 
+  // Función para manejar el envío del formulario de actualización de contraseña
   const handleActualizar = async (e) => {
     e.preventDefault();
 
+    // Validar que las nuevas contraseñas coincidan antes de enviar
     if (nueva !== repetir) {
       setMensaje("Las nuevas contraseñas no coinciden.");
       return;
     }
 
     try {
+      // Llamada PUT a la API para actualizar la contraseña del usuario autenticado
       await axios.put(
         `http://localhost:3000/api/usuarios/${usuario.id_usuario}/password`,
         {
@@ -41,11 +51,14 @@ export default function ActualizarPerfil() {
           },
         }
       );
+
+      // Mensaje de éxito y limpiar campos de contraseña
       setMensaje("Contraseña actualizada correctamente.");
       setActual("");
       setNueva("");
       setRepetir("");
     } catch (error) {
+      // Mensaje de error si la actualización falla
       setMensaje("Error al actualizar la contraseña.");
     }
   };

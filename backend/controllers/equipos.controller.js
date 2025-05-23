@@ -1,6 +1,8 @@
 const Equipo = require('../models/equipo.model');
 
+// Controlador para operaciones CRUD de equipos
 const EquiposController = {
+  // Obtiene todos los equipos
   obtenerTodos: async (req, res) => {
     try {
       const equipos = await Equipo.obtenerTodos();
@@ -10,6 +12,7 @@ const EquiposController = {
     }
   },
 
+  // Obtiene un equipo específico por ID
   obtenerPorId: async (req, res) => {
     try {
       const equipo = await Equipo.obtenerPorId(req.params.id);
@@ -20,6 +23,7 @@ const EquiposController = {
     }
   },
 
+  // Filtra equipos por tipo
   obtenerPorTipo: async (req, res) => {
     try {
       const equipos = await Equipo.obtenerPorTipo(req.params.tipo);
@@ -29,6 +33,7 @@ const EquiposController = {
     }
   },
 
+  // Busca equipos por nombre (búsqueda aproximada)
   buscarPorNombre: async (req, res) => {
     try {
       const equipos = await Equipo.buscarPorNombre(req.params.nombre);
@@ -38,17 +43,23 @@ const EquiposController = {
     }
   },
 
+  // Crea un nuevo equipo con estado 'Disponible' por defecto
   crear: async (req, res) => {
     try {
       const { nombre, tipo, codigo_inventario, estado } = req.body;
-      const id = await Equipo.crear({ nombre, tipo, codigo_inventario, estado: estado || 'Disponible' });
+      const id = await Equipo.crear({ 
+        nombre, 
+        tipo, 
+        codigo_inventario, 
+        estado: estado || 'Disponible'  // Valor por defecto si no se especifica
+      });
       res.status(201).json({ message: 'Equipo creado', id });
     } catch (error) {
       res.status(500).json({ message: 'Error al crear equipo', error });
     }
   },
 
-
+  // Actualiza un equipo existente
   actualizar: async (req, res) => {
     try {
       await Equipo.actualizar(req.params.id, req.body);
@@ -58,6 +69,7 @@ const EquiposController = {
     }
   },
 
+  // Elimina un equipo por ID
   eliminar: async (req, res) => {
     try {
       await Equipo.eliminar(req.params.id);

@@ -5,16 +5,22 @@ import axios from "axios";
 import ConfirmacionPrestamoModal from "./ConfirmacionPrestamoModal";
 
 export default function PedirPrestamoModal({ isOpen, onClose, equipo, onPrestamoConfirmado }) {
+  // Obtener datos del usuario autenticado desde el contexto
   const { usuario } = useAuth();
+  // Estado para la fecha de inicio del préstamo
   const [fechaInicio, setFechaInicio] = useState("");
+  // Estado para la fecha esperada de devolución
   const [fechaFin, setFechaFin] = useState("");
+  // Estado para mostrar modal de confirmación después del préstamo
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
+  // Función que maneja el envío del formulario para confirmar el préstamo
   const handleConfirmar = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // evitar recarga de página
     try {
+      // Enviar datos al backend para crear el préstamo
       await axios.post(
-        "http://localhost:3000/api/movimientos/prestamos",
+        "http://localhost:3000/api/movimientos",
         {
           fecha_prestamo: fechaInicio,
           fecha_devolucion_esperada: fechaFin,
@@ -22,25 +28,30 @@ export default function PedirPrestamoModal({ isOpen, onClose, equipo, onPrestamo
         },
         {
           headers: {
-            Authorization: `Bearer ${usuario.token}`,
+            Authorization: `Bearer ${usuario.token}`, // incluir token en encabezado
           },
         }
       );
 
+      // Ejecutar callback tras confirmar préstamo si existe
       onPrestamoConfirmado?.();
-      onClose(); // cierra el modal actual
-      setMostrarConfirmacion(true); // abre el de confirmación
+      // Cerrar el modal de pedido de préstamo
+      onClose();
+      // Mostrar modal de confirmación
+      setMostrarConfirmacion(true);
     } catch (error) {
+      // Mostrar error en consola si falla el registro del préstamo
       console.error("Error al registrar préstamo:", error);
     }
   };
 
+  // Si el modal no está abierto o no hay equipo seleccionado, mostrar modal de confirmación
   if (!isOpen || !equipo) return (
     <ConfirmacionPrestamoModal
       isOpen={mostrarConfirmacion}
       onClose={() => setMostrarConfirmacion(false)}
       onDescargar={() =>
-        generarPDF({ usuario, equipo, fechaInicio, fechaFin })
+        generarPDF({ usuario, equipo, fechaInicio, fechaFin }) // generar PDF con datos
       }
     />
   );

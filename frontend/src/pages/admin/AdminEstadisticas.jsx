@@ -14,27 +14,31 @@ import {
 } from "recharts";
 
 export default function AdminEstadisticas() {
-  const { usuario } = useAuth();
-  const [porMes, setPorMes] = useState([]);
-  const [masPrestados, setMasPrestados] = useState([]);
+  const { usuario } = useAuth(); // Obtenemos datos del usuario autenticado
+  const [porMes, setPorMes] = useState([]); // Datos estadísticos agrupados por mes
+  const [masPrestados, setMasPrestados] = useState([]); // Datos de equipos más prestados
 
+  // useEffect para cargar datos estadísticos al montar el componente y cada vez que cambia el token
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
+        // Solicitar estadísticas de movimientos agrupados por mes
         const resMes = await axios.get("http://localhost:3000/api/movimientos/estadisticas", {
           headers: { Authorization: `Bearer ${usuario.token}` },
         });
-        setPorMes(resMes.data);
+        setPorMes(resMes.data); // Guardar datos por mes en estado
 
+        // Solicitar datos de los equipos más prestados
         const resEquipos = await axios.get("http://localhost:3000/api/movimientos/estadisticas/equipos", {
           headers: { Authorization: `Bearer ${usuario.token}` },
         });
-        setMasPrestados(resEquipos.data);
+        setMasPrestados(resEquipos.data); // Guardar datos de equipos más prestados en estado
 
-        // Debug opcional:
+        // Logs para depuración en consola
         console.log("Por Mes:", resMes.data);
         console.log("Más Prestados:", resEquipos.data);
       } catch (error) {
+        // Manejo de errores en caso de fallo en las solicitudes
         console.error("Error al cargar estadísticas:", error);
       }
     };

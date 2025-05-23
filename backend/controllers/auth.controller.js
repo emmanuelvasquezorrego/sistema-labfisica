@@ -8,10 +8,12 @@ const AuthController = {
       const { correo, contraseña } = req.body;
       const usuario = await Usuario.findByEmail(correo);
       
+      // Validación de credenciales (usuario + contraseña encriptada)
       if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
         return res.status(401).json({ error: "Credenciales inválidas" });
       }
 
+      // Genera token JWT con ID y rol (expira en 8h)
       const token = jwt.sign(
         { id: usuario.id_usuario, rol: usuario.rol },
         process.env.JWT_SECRET,
