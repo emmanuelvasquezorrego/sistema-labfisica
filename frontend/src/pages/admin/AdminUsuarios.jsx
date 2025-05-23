@@ -3,63 +3,68 @@ import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminUsuarios() {
-  const { usuario } = useAuth();
-  const [usuarios, setUsuarios] = useState([]);
-  const [filtro, setFiltro] = useState("");
-  const [ediciones, setEdiciones] = useState({});
+  const { usuario } = useAuth(); // Obtener datos del usuario autenticado (token, id, etc)
+  const [usuarios, setUsuarios] = useState([]); // Lista de usuarios obtenidos del backend
+  const [filtro, setFiltro] = useState(""); // Texto para filtrar usuarios por nombre o correo
+  const [ediciones, setEdiciones] = useState({}); // Objeto para guardar cambios temporales por usuario (id => campos editados)
 
+  // Función para obtener todos los usuarios desde la API
   const obtenerUsuarios = async () => {
     try {
       const res = await axios.get("http://localhost:3000/api/usuarios", {
         headers: {
-          Authorization: `Bearer ${usuario.token}`,
+          Authorization: `Bearer ${usuario.token}`, // Autenticación con token JWT
         },
       });
-      setUsuarios(res.data);
+      setUsuarios(res.data); // Guardar usuarios en estado
     } catch (err) {
-      console.error("Error al cargar usuarios:", err);
+      console.error("Error al cargar usuarios:", err); // Mostrar error en consola
     }
   };
 
+  // Función para actualizar el objeto de ediciones cuando el usuario modifica un campo
   const handleEditar = (id, campo, valor) => {
     setEdiciones((prev) => ({
       ...prev,
-      [id]: { ...prev[id], [campo]: valor },
+      [id]: { ...prev[id], [campo]: valor }, // Mantener ediciones anteriores, actualizar el campo modificado
     }));
   };
 
+  // Función para enviar al backend los cambios realizados a un usuario específico
   const guardarCambios = async (id) => {
     try {
       await axios.put(
         `http://localhost:3000/api/usuarios/${id}`,
-        ediciones[id],
+        ediciones[id], // Enviar solo los campos editados para ese usuario
         {
           headers: {
-            Authorization: `Bearer ${usuario.token}`,
+            Authorization: `Bearer ${usuario.token}`, // Token para autorización
           },
         }
       );
-      alert("Usuario actualizado");
+      alert("Usuario actualizado"); // Confirmación al usuario
+      // Eliminar ediciones guardadas para este usuario porque ya fueron enviadas
       setEdiciones((prev) => {
         const nuevo = { ...prev };
         delete nuevo[id];
         return nuevo;
       });
-      obtenerUsuarios();
+      obtenerUsuarios(); // Recargar lista actualizada desde el backend
     } catch (err) {
       console.error("Error al actualizar usuario:", err);
-      alert("No se pudo actualizar el usuario");
+      alert("No se pudo actualizar el usuario"); // Mensaje en caso de error
     }
   };
 
+  // Función para restablecer la contraseña de un usuario (admin ingresa nueva contraseña mediante prompt)
   const restablecerContraseña = async (id) => {
     const nueva = prompt("Ingrese la nueva contraseña para este usuario:");
-    if (!nueva) return;
+    if (!nueva) return; // Si cancela o deja vacío, no hace nada
 
     try {
       await axios.put(
         `http://localhost:3000/api/usuarios/${id}/password`,
-        { nuevaContraseña: nueva },
+        { nuevaContraseña: nueva }, // Enviar la nueva contraseña
         {
           headers: {
             Authorization: `Bearer ${usuario.token}`,
@@ -73,6 +78,7 @@ export default function AdminUsuarios() {
     }
   };
 
+  // Función para eliminar un usuario con confirmación previa
   const eliminarUsuario = async (id) => {
     if (!window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) return;
 
@@ -83,19 +89,21 @@ export default function AdminUsuarios() {
         },
       });
       alert("Usuario eliminado");
-      obtenerUsuarios();
+      obtenerUsuarios(); // Recargar la lista luego de eliminar
     } catch (err) {
       console.error("Error al eliminar usuario:", err);
       alert("No se pudo eliminar el usuario");
     }
   };
 
+  // Filtrar usuarios según texto en nombre o correo (case insensitive)
   const usuariosFiltrados = usuarios.filter(
     (u) =>
       u.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
       u.correo.toLowerCase().includes(filtro.toLowerCase())
   );
 
+  // Al montar el componente, obtener usuarios desde el backend
   useEffect(() => {
     obtenerUsuarios();
   }, []);

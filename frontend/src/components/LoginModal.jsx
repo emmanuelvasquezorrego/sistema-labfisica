@@ -2,26 +2,36 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
-export default function LoginModal({ isOpen, onClose }) {
+export default function LoginModal({ isOpen, onClose, onAbrirRegistro }) {
+  // Obtener la función de login del contexto de autenticación
   const { login } = useAuth();
+  // Estado para controlar el correo ingresado
   const [correo, setCorreo] = useState("");
+  // Estado para controlar la contraseña ingresada
   const [contraseña, setContraseña] = useState("");
+  // Estado para controlar el mensaje de error en el login
   const [error, setError] = useState("");
 
+  // Función que se ejecuta al enviar el formulario de login
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Evita recargar la página al enviar el formulario
     try {
+      // Intentar autenticar al usuario enviando correo y contraseña al backend
       const res = await axios.post("http://localhost:3000/api/usuarios/login", {
         correo,
         contraseña,
       });
+      // Si el login es exitoso, guardar datos y token en el contexto
       login({ ...res.data.usuario, token: res.data.token });
+      // Cerrar modal de login
       onClose();
     } catch (err) {
+      // Si hay error, mostrar mensaje de credenciales inválidas
       setError("Credenciales inválidas");
     }
   };
 
+  // Si el modal no está abierto, no renderizar nada
   if (!isOpen) return null;
 
   return (
@@ -51,6 +61,13 @@ export default function LoginModal({ isOpen, onClose }) {
         <button onClick={onClose} className="mt-3 text-sm text-gray-500 hover:underline">
           Cancelar
         </button>
+
+        <p className="mt-4 text-sm text-center">
+          ¿No tienes una cuenta?{" "}
+          <button onClick={() => { onClose(); onAbrirRegistro(); }} className="text-vino hover:underline">
+            Regístrate
+          </button>
+        </p>
       </div>
     </div>
   );
