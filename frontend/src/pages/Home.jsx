@@ -4,11 +4,6 @@ import FiltroEquipos from "../components/FiltroEquipos";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
-
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext";
-
 export default function Home({ onAbrirLogin, onAbrirPrestamo }) {
   const { usuario } = useAuth(); // Obtenemos el usuario autenticado desde el contexto
 

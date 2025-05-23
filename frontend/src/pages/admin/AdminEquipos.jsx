@@ -3,23 +3,12 @@ import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminEquipos() {
-  const { usuario } = useAuth(); // Usuario autenticado del contexto
-
-  // Estado para la lista de equipos existentes
+  // Obtener datos del usuario autenticado desde el contexto
+  const { usuario } = useAuth();
+  // Estado para almacenar los equipos
   const [equipos, setEquipos] = useState([]);
-  
-  // Estado para manejar el archivo de imagen (por si se añade funcionalidad)
-  const [imagenFile, setImagenFile] = useState(null);
 
-  // Estado para el formulario de creación de nuevo equipo
-  const [nuevoEquipo, setNuevoEquipo] = useState({
-    nombre: "",
-    tipo: "",
-    codigo_inventario: "",
-    estado: "Disponible",
-  });
-
-  // Función para obtener la lista de equipos desde el backend
+  // Función para obtener todos los equipos desde el backend
   const obtenerEquipos = async () => {
     try {
       const res = await axios.get("http://localhost:3000/api/equipos", {
@@ -33,87 +22,109 @@ export default function AdminEquipos() {
     }
   };
 
-  // Función para manejar cambios en campos de equipos (edición inline)
+  // Función para manejar cambios en los campos de los equipos
   const handleCambio = (id, campo, valor) => {
     setEquipos((prev) =>
-      prev.map((eq) => (eq.id_equipo === id ? { ...eq, [campo]: valor } : eq))
+      prev.map((eq) =>
+        eq.id_equipo === id ? { ...eq, [campo]: valor } : eq
+      )
     );
   };
 
-  // Guardar los cambios hechos a un equipo en el backend
+  // Función para guardar los cambios realizados en un equipo
   const guardarCambios = async (equipo) => {
     try {
-      await axios.put(`http://localhost:3000/api/equipos/${equipo.id_equipo}`, equipo, {
-        headers: {
-          Authorization: `Bearer ${usuario.token}`,
-        },
-      });
+      const datosActualizados = {
+        nombre: equipo.nombre,
+        tipo: equipo.tipo,
+        estado: equipo.estado,
+      };
+
+      await axios.put(
+        `http://localhost:3000/api/equipos/${equipo.id_equipo}`,
+        datosActualizados,
+        {
+          headers: {
+            Authorization: `Bearer ${usuario.token}`,
+          },
+        }
+      );
+
       alert("Equipo actualizado");
     } catch (err) {
-      console.error("Error al guardar equipo:", err);
+      console.error("Error al guardar equipo:", err.response?.data || err.message);
       alert("Error al actualizar equipo");
     }
   };
 
-  // Crear un nuevo equipo con la información del formulario
+  // Función para crear un nuevo equipo
   const crearEquipo = async () => {
     try {
-      // Validación básica de campos obligatorios
+      // Validación básica
       if (!nuevoEquipo.nombre || !nuevoEquipo.tipo) {
         alert("Nombre y tipo son campos requeridos");
         return;
       }
 
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:3000/api/equipos",
         {
           nombre: nuevoEquipo.nombre,
           tipo: nuevoEquipo.tipo,
           codigo_inventario: nuevoEquipo.codigo_inventario,
-          estado: nuevoEquipo.estado,
+          estado: nuevoEquipo.estado
         },
         {
           headers: {
             Authorization: `Bearer ${usuario.token}`,
-            "Content-Type": "application/json",
-          },
+            'Content-Type': 'application/json' // Cambiado a JSON
+          }
         }
       );
 
-      // Limpiar formulario y recargar lista
-      setNuevoEquipo({
-        nombre: "",
-        tipo: "",
-        codigo_inventario: "",
-        estado: "Disponible",
+      // Resetear formulario
+      setNuevoEquipo({ 
+        nombre: "", 
+        tipo: "", 
+        codigo_inventario: "", 
+        estado: "Disponible" 
       });
       obtenerEquipos();
       alert("Equipo creado con éxito");
+
     } catch (err) {
       console.error("Error al crear equipo:", err.response?.data || err.message);
       alert(`Error al crear equipo: ${err.response?.data?.message || err.message}`);
     }
   };
 
-  // Eliminar un equipo con confirmación previa
+  // Función para eliminar un equipo
   const eliminarEquipo = async (id_equipo) => {
-    if (!window.confirm("¿Estás seguro de que deseas eliminar este equipo?")) return;
+  if (!window.confirm("¿Estás seguro de que deseas eliminar este equipo?")) return;
 
-    try {
-      await axios.delete(`http://localhost:3000/api/equipos/${id_equipo}`, {
-        headers: {
-          Authorization: `Bearer ${usuario.token}`,
-        },
-      });
-      obtenerEquipos(); // Recargar lista después de eliminar
-      alert("Equipo eliminado");
-    } catch (err) {
-      console.error("Error al eliminar equipo:", err);
-      alert("No se pudo eliminar el equipo");
-    }
-  };
+  try {
+    await axios.delete(`http://localhost:3000/api/equipos/${id_equipo}`, {
+      headers: {
+        Authorization: `Bearer ${usuario.token}`,
+      },
+    });
+    obtenerEquipos(); // recargar
+    alert("Equipo eliminado");
+  } catch (err) {
+    console.error("Error al eliminar equipo:", err);
+    alert("No se pudo eliminar el equipo");
+  }
+};
 
-  // Cargar equipos al montar el componente
+  // Estado para almacenar los datos del nuevo equipo
+  const [nuevoEquipo, setNuevoEquipo] = useState({
+    nombre: "",
+    tipo: "",
+    codigo_inventario: "",
+    estado: "Disponible",
+  });
+
+  // Efecto para cargar los equipos al montar el componente
   useEffect(() => {
     obtenerEquipos();
   }, []);

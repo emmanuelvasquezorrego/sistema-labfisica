@@ -4,25 +4,27 @@ const EquiposController = require('../controllers/equipos.controller');
 const auth = require('../middlewares/auth.middleware');
 const autorizarRol = require('../middlewares/roles.middleware');
 
-// Ruta para obtener todos los equipos, sin autenticación
-router.get('/', EquiposController.obtenerTodos);
+// Rutas para manejar las operaciones CRUD de equipos
 
-// Ruta para obtener un equipo por ID, requiere autenticación
-router.get('/:id', auth, EquiposController.obtenerPorId);
-
-// Ruta para obtener equipos por tipo, sin autenticación
+// Obtener equipos por tipo
 router.get('/tipo/:tipo', EquiposController.obtenerPorTipo);
 
-// Ruta para buscar equipos por nombre, requiere autenticación
+// Buscar equipos por nombre
 router.get('/buscar/nombre/:nombre', auth, EquiposController.buscarPorNombre);
 
-// Ruta para crear un nuevo equipo, requiere autenticación y rol admin
+// Obtener un equipo por ID
+router.get('/:id', auth, EquiposController.obtenerPorId);
+
+// Obtener todos los equipos
+router.get('/', EquiposController.obtenerTodos);
+
+// Crear un nuevo equipo
 router.post('/', auth, autorizarRol('admin'), EquiposController.crear);
 
-// Ruta para actualizar un equipo por ID, requiere autenticación y rol admin
+// Actualizar un equipo
 router.put('/:id', auth, autorizarRol('admin'), EquiposController.actualizar);
 
-// Ruta para eliminar un equipo por ID, requiere autenticación y rol admin
+// Eliminar un equipo
 router.delete('/:id', auth, autorizarRol('admin'), EquiposController.eliminar);
 
 module.exports = router;

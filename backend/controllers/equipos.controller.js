@@ -1,8 +1,9 @@
 const Equipo = require('../models/equipo.model');
 
-// Controlador para operaciones CRUD de equipos
+// Controlador para manejar las operaciones CRUD de equipos
 const EquiposController = {
-  // Obtiene todos los equipos
+
+  // Método para obtener todos los equipos
   obtenerTodos: async (req, res) => {
     try {
       const equipos = await Equipo.obtenerTodos();
@@ -12,7 +13,7 @@ const EquiposController = {
     }
   },
 
-  // Obtiene un equipo específico por ID
+  // Método para obtener un equipo por su ID
   obtenerPorId: async (req, res) => {
     try {
       const equipo = await Equipo.obtenerPorId(req.params.id);
@@ -23,7 +24,7 @@ const EquiposController = {
     }
   },
 
-  // Filtra equipos por tipo
+  // Método para obtener equipos por tipo
   obtenerPorTipo: async (req, res) => {
     try {
       const equipos = await Equipo.obtenerPorTipo(req.params.tipo);
@@ -33,7 +34,7 @@ const EquiposController = {
     }
   },
 
-  // Busca equipos por nombre (búsqueda aproximada)
+  // Método para buscar equipos por nombre
   buscarPorNombre: async (req, res) => {
     try {
       const equipos = await Equipo.buscarPorNombre(req.params.nombre);
@@ -43,33 +44,33 @@ const EquiposController = {
     }
   },
 
-  // Crea un nuevo equipo con estado 'Disponible' por defecto
+  // Método para crear un nuevo equipo
   crear: async (req, res) => {
     try {
       const { nombre, tipo, codigo_inventario, estado } = req.body;
-      const id = await Equipo.crear({ 
-        nombre, 
-        tipo, 
-        codigo_inventario, 
-        estado: estado || 'Disponible'  // Valor por defecto si no se especifica
-      });
+      const id = await Equipo.crear({ nombre, tipo, codigo_inventario, estado: estado || 'Disponible' });
       res.status(201).json({ message: 'Equipo creado', id });
     } catch (error) {
       res.status(500).json({ message: 'Error al crear equipo', error });
     }
   },
 
-  // Actualiza un equipo existente
+  // Método para actualizar un equipo
   actualizar: async (req, res) => {
     try {
-      await Equipo.actualizar(req.params.id, req.body);
+      const { id } = req.params;
+      const datos = req.body;
+      console.log('Actualizar equipo:', id, datos);
+
+      await Equipo.actualizar(id, datos);
       res.json({ message: 'Equipo actualizado' });
     } catch (error) {
+      console.error('Error al actualizar equipo:', error);
       res.status(500).json({ message: 'Error al actualizar', error });
     }
   },
 
-  // Elimina un equipo por ID
+  // Método para eliminar un equipo
   eliminar: async (req, res) => {
     try {
       await Equipo.eliminar(req.params.id);

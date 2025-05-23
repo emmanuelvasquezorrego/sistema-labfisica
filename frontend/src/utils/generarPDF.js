@@ -1,4 +1,6 @@
 // Función para generar un PDF con los detalles del préstamo
+import jsPDF from "jspdf"; // Importa la librería jsPDF
+
 export default function generarPDF({ usuario, equipo, fechaInicio, fechaFin }) {
   const doc = new jsPDF();
 

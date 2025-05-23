@@ -2,10 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext";
-
 export default function MisPrestamos({ recargar, onRecargado }) {
   const { usuario } = useAuth(); // Obtenemos el usuario autenticado desde el contexto
   const [historial, setHistorial] = useState([]); // Estado para guardar el historial de préstamos
